@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#23674d">
+  <title>Achadinhos · Seu painel de ofertas</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%2323674d'/%3E%3Cpath d='M18 23h28l-3 26H21z' fill='%23d8ed9c'/%3E%3Cpath d='M25 24v-5a7 7 0 0114 0v5' fill='none' stroke='%23d8ed9c' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Achadinhos, início"><span class="brand-mark" data-icon="bag"></span><span>achadinhos<span class="brand-dot">.</span></span></a>
+      <div class="workspace-label">SEU ESPAÇO DE OFERTAS</div>
+      <nav aria-label="Navegação principal">
+        <button class="nav-item active" id="nav-queue"><span data-icon="grid"></span> Minha fila <span class="nav-badge" id="sidebar-count">0</span></button>
+        <button class="nav-item" id="lab-button" aria-label="Testar validadora IA" title="Testar validadora IA"><span data-icon="sparkles"></span> Validadora IA</button>
+        <button class="nav-item" id="integrations-button" aria-label="Integrações" title="Integrações"><span data-icon="shield"></span> Integrações</button>
+        <button class="nav-item" id="settings-button"><span data-icon="settings"></span> Configurações</button>
+      </nav>
+      <div class="sidebar-guide">
+        <span class="guide-illustration" data-icon="sparkles"></span>
+        <strong>Boas ofertas, no seu ritmo.</strong>
+        <p>Selecione, prepare e compartilhe. Seu próximo achadinho começa aqui.</p>
+        <span class="guide-pill">Feito para começar simples</span>
+      </div>
+      <div class="sidebar-bottom">
+        <span class="workspace-avatar" data-icon="home"></span>
+        <div><strong id="sidebar-channel">Meu canal de ofertas</strong><span>Salvo neste computador</span></div>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <span class="breadcrumb">Meu espaço <span>/</span> <strong>Fila de ofertas</strong></span>
+        <div class="connection-status" id="connection-status"><span></span> Conectando…</div>
+      </header>
+      <main>
+        <section class="page-heading">
+          <div><p class="eyebrow">MENOS TRABALHO. MAIS ACHADINHOS.</p><h1>Suas ofertas, organizadas<span>.</span></h1><p class="page-description">Tudo pronto para compartilhar uma boa oportunidade.</p></div>
+          <div class="heading-actions"><button class="button button-secondary" id="open-lab"><span data-icon="sparkles"></span> Testar validadora IA</button><button class="button button-primary" id="new-offer"><span data-icon="plus"></span> Nova oferta</button></div>
+        </section>
+
+        <section class="intro-banner" aria-label="Como este painel funciona">
+          <div class="banner-icon" data-icon="whatsapp"></div>
+          <div><strong>Você escolhe. O painel prepara. Você compartilha.</strong><p>As mensagens ficam prontas aqui. O envio no WhatsApp é manual, sempre com sua revisão.</p></div>
+          <span class="manual-pill"><span class="small-dot"></span> Envio manual</span>
+        </section>
+
+        <section class="stats" aria-label="Resumo de ofertas">
+          <button class="stat-card" data-filter="ready"><span class="stat-icon ready-icon" data-icon="check"></span><span class="stat-copy"><span>Prontas para compartilhar</span><strong id="count-ready">0</strong></span><span class="stat-arrow" data-icon="arrow-up-right"></span></button>
+          <button class="stat-card" data-filter="scheduled"><span class="stat-icon scheduled-icon" data-icon="clock"></span><span class="stat-copy"><span>Agendadas para preparar</span><strong id="count-scheduled">0</strong></span><span class="stat-arrow" data-icon="arrow-up-right"></span></button>
+          <button class="stat-card" data-filter="sent"><span class="stat-icon sent-icon" data-icon="send"></span><span class="stat-copy"><span>Marcadas como enviadas</span><strong id="count-sent">0</strong></span><span class="stat-arrow" data-icon="arrow-up-right"></span></button>
+        </section>
+
+        <section class="queue-section" aria-labelledby="queue-heading">
+          <div class="section-heading"><div><h2 id="queue-heading">Sua fila de ofertas <span id="total-count">0</span></h2><p>Uma boa curadoria faz toda a diferença.</p></div><div class="backup-actions"><a href="/api/backup" class="button button-quiet" download="achadinhos-backup.json"><span data-icon="download"></span> Fazer backup</a><button class="icon-button" id="import-button" title="Importar backup" aria-label="Importar backup"><span data-icon="upload"></span></button><input type="file" id="import-file" accept="application/json,.json" hidden></div></div>
+          <div class="queue-toolbar"><div class="filter-tabs" role="group" aria-label="Filtrar ofertas"><button class="filter-tab selected" data-filter="all" aria-pressed="true">Todas</button><button class="filter-tab" data-filter="ready" aria-pressed="false">Prontas</button><button class="filter-tab" data-filter="scheduled" aria-pressed="false">Agendadas</button><button class="filter-tab" data-filter="draft" aria-pressed="false">Rascunhos</button><button class="filter-tab" data-filter="sent" aria-pressed="false">Enviadas</button><button class="filter-tab" data-filter="archived" aria-pressed="false">Arquivadas</button></div><label class="search-box"><span data-icon="search"></span><input type="search" id="search" placeholder="Buscar oferta…" aria-label="Buscar oferta"></label></div>
+          <div id="offers-list" class="offers-list" aria-live="polite"><div class="loading-state">Carregando sua fila…</div></div>
+          <div class="queue-footer"><span data-icon="shield"></span><span>Seus links e ofertas ficam salvos localmente. Nenhum envio acontece sozinho.</span></div>
+        </section>
+
+        <section class="bottom-tips"><div><span data-icon="clock"></span><p><strong>Desligou o computador? Tudo bem.</strong> Ao abrir de novo, as ofertas atrasadas ficam prontas para sua revisão.</p></div><div><span data-icon="heart"></span><p><strong>Qualidade vale mais que quantidade.</strong> Confira preço, frete e validade antes de compartilhar.</p></div></section>
+        <footer class="page-footer"><span>achadinhos<span class="brand-dot">.</span></span><p>Seu negócio começa com uma boa oferta.</p></footer>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="offer-dialog" class="modal offer-modal" aria-labelledby="offer-dialog-title">
+    <div class="modal-header"><div><p class="eyebrow">SUA CURADORIA</p><h2 id="offer-dialog-title">Novo achadinho</h2></div><button class="icon-button" type="button" data-close="offer-dialog" aria-label="Fechar cadastro"><span data-icon="x"></span></button></div>
+    <form id="offer-form">
+      <div class="modal-body">
+        <p class="form-intro">Cadastre uma oferta com seu link de afiliado. Você pode guardar, preparar agora ou agendar.</p>
+        <label class="field">Nome do produto <span>*</span><input name="title" required maxlength="180" placeholder="Ex.: Organizador de cozinha com 3 peças"></label>
+        <label class="field">Seu link de afiliado <span>*</span><input name="url" type="url" required maxlength="2048" placeholder="https://…"><small>Use o link gerado pelo seu programa de afiliados.</small></label>
+        <div class="form-grid"><label class="field">Loja<select name="store"><option>Shopee</option><option>Amazon</option><option>Mercado Livre</option><option>Outra</option></select></label><label class="field">Categoria<input name="category" maxlength="80" placeholder="Ex.: Casa e dia a dia"></label></div>
+        <div class="form-grid"><label class="field">Preço da oferta (R$) <span>*</span><input name="price" required inputmode="decimal" maxlength="20" placeholder="29,90"></label><label class="field">Preço anterior (R$)<input name="original_price" inputmode="decimal" maxlength="20" placeholder="Opcional"></label></div>
+        <label class="field">Cupom<input name="coupon" maxlength="80" placeholder="Opcional"></label>
+        <label class="field">Observações<textarea name="notes" rows="3" maxlength="500" placeholder="Ex.: Confira o frete para seu CEP. Cupom válido até hoje."></textarea></label>
+        <div class="form-divider"></div>
+        <label class="field">O que fazer com esta oferta?<select name="status" id="offer-status"><option value="ready">Deixar pronta para compartilhar</option><option value="scheduled">Agendar preparação da mensagem</option><option value="draft">Salvar como rascunho</option></select></label>
+        <label class="field" id="schedule-field" hidden>Preparar a partir de<input type="datetime-local" name="scheduled_at" id="scheduled-at"><small id="timezone-label">Horário local deste computador.</small></label>
+        <div class="form-note"><span data-icon="info"></span><p>O agendamento prepara a mensagem; não envia no WhatsApp. Mantenha o aplicativo aberto para acompanhar os horários.</p></div>
+        <p class="inline-error" id="offer-error" role="alert" hidden></p>
+      </div>
+      <div class="modal-footer"><button class="button button-secondary" type="button" data-close="offer-dialog">Cancelar</button><button class="button button-primary" id="save-offer" type="submit"><span data-icon="check"></span> Salvar oferta</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="review-dialog" class="modal review-modal" aria-labelledby="review-title">
+    <div class="modal-header"><div><p class="eyebrow">PRONTA DO SEU JEITO</p><h2 id="review-title">Revisar mensagem</h2></div><button class="icon-button" data-close="review-dialog" aria-label="Fechar mensagem"><span data-icon="x"></span></button></div>
+    <div class="modal-body"><p class="form-intro">Confira os detalhes e escolha onde compartilhar no WhatsApp.</p><label class="field message-label">Mensagem da oferta<textarea id="message-preview" readonly rows="12"></textarea></label><p class="review-reminder"><span data-icon="info"></span>Preços e cupons são os que você cadastrou. Confira se continuam válidos na loja.</p><div class="review-primary-actions"><button class="button button-secondary" id="copy-message"><span data-icon="copy"></span> Copiar mensagem</button><a class="button button-primary" id="open-whatsapp" href="https://wa.me/" target="_blank" rel="noopener noreferrer"><span data-icon="whatsapp"></span> Abrir WhatsApp</a></div><div class="sent-confirmation"><div><strong>Já compartilhou a oferta?</strong><p>Abrir o WhatsApp não confirma o envio. Marque depois de enviar.</p></div><button class="button button-secondary" id="mark-sent"><span data-icon="check"></span> Marcar como enviada</button></div><p class="inline-error" id="review-error" role="alert" hidden></p></div>
+  </dialog>
+
+  <dialog id="settings-dialog" class="modal settings-modal" aria-labelledby="settings-title">
+    <div class="modal-header"><div><p class="eyebrow">DO SEU JEITO</p><h2 id="settings-title">Seu espaço de ofertas</h2></div><button class="icon-button" data-close="settings-dialog" aria-label="Fechar configurações"><span data-icon="x"></span></button></div>
+    <form id="settings-form"><div class="modal-body"><label class="field">Nome do canal ou comunidade<input name="channel_name" id="channel-name" required maxlength="100" placeholder="Ex.: Achadinhos de Lagarto"><small>Este nome aparece nas mensagens preparadas.</small></label><div class="form-note"><span data-icon="shield"></span><p>As ofertas ficam neste computador. Faça um backup antes de trocar de máquina ou reinstalar o aplicativo.</p></div><p class="inline-error" id="settings-error" role="alert" hidden></p></div><div class="modal-footer"><button class="button button-secondary" type="button" data-close="settings-dialog">Cancelar</button><button class="button button-primary" id="save-settings" type="submit">Salvar nome</button></div></form>
+  </dialog>
+
+  <dialog id="lab-dialog" class="modal lab-modal" aria-labelledby="lab-title">
+    <div class="modal-header"><div><p class="eyebrow">UM LOTE DE CADA VEZ</p><h2 id="lab-title">Testar validadora IA</h2></div><button class="icon-button" type="button" data-close="lab-dialog" aria-label="Fechar validadora IA"><span data-icon="x"></span></button></div>
+    <div class="modal-body">
+      <p class="form-intro">Carregue ofertas, teste os filtros e peça uma seleção à IA. A análise usa os dados fornecidos: não consulta lojas nem comprova preços ou disponibilidade.</p>
+      <div class="lab-steps" aria-label="Etapas do teste"><span><b>1</b> Carregar lote</span><span><b>2</b> Analisar</span><span><b>3</b> Revisar rascunhos</span></div>
+      <div class="lab-source-actions"><button type="button" class="button button-secondary" id="lab-panel-offers"><span data-icon="bag"></span> Usar ofertas do painel</button><button type="button" class="button button-secondary" id="lab-examples"><span data-icon="sparkles"></span> Carregar exemplos fictícios</button><button type="button" class="button button-secondary" id="lab-import"><span data-icon="upload"></span> Importar ofertas JSON</button><input type="file" id="lab-file" accept="application/json,.json" hidden></div>
+      <p class="lab-source-status" id="lab-source-status" role="status">Comece pelos exemplos para testar sem ofertas reais.</p>
+      <details class="json-editor"><summary>Ver ou editar dados do lote (JSON)</summary><label class="field">Candidatos para análise<textarea id="lab-candidates" rows="8" spellcheck="false" placeholder="Carregue os exemplos ou cole uma lista JSON com até 20 candidatos."></textarea><small>Cada candidato precisa de identificação, produto, link, preço, disponibilidade e horário da consulta. Os exemplos mostram o formato. Use somente fontes permitidas.</small></label></details>
+      <div class="form-grid lab-options"><label class="field">Nicho desejado<input id="lab-niche" maxlength="120" value="Casa e dia a dia" placeholder="Ex.: Casa e dia a dia"></label><label class="field">Selecionar no máximo<select id="lab-max-results"><option value="1">1 oferta</option><option value="2" selected>2 ofertas</option><option value="3">3 ofertas</option><option value="4">4 ofertas</option><option value="5">5 ofertas</option></select></label></div>
+      <div class="lab-provider-status"><div><strong id="lab-provider-label">Carregando configuração da IA…</strong><p id="lab-provider-note">Os filtros podem ser testados sem chave e sem chamada de IA.</p></div><button type="button" class="button button-quiet" id="lab-configure">Configurar IA</button></div>
+      <div class="lab-run-actions"><button type="button" class="button button-secondary" id="lab-test-rules"><span data-icon="shield"></span> Testar filtros (sem IA)</button><button type="button" class="button button-primary" id="lab-test-ai"><span data-icon="sparkles"></span> Analisar com IA</button></div>
+      <p class="lab-cost-note">A análise com IA envia os dados do lote à OpenAI e pode gerar cobrança na sua conta de API. A assinatura do ChatGPT é separada. Nunca inclua senhas ou tokens no lote.</p>
+      <p class="inline-error" id="lab-error" role="alert" hidden></p>
+      <div id="lab-progress" class="lab-progress" role="status" hidden>Preparando análise…</div>
+      <section id="lab-results" class="lab-results" aria-labelledby="lab-results-title" aria-live="polite" hidden><div class="lab-results-heading"><h3 id="lab-results-title">Resultado da análise</h3><span id="lab-engine" class="status-tag"></span></div><p id="lab-run-summary" class="lab-run-summary"></p><div id="lab-selected" class="lab-selected"></div><details id="lab-rejected-section" class="lab-rejected"><summary id="lab-rejected-summary">Ofertas descartadas</summary><ul id="lab-rejected-list"></ul></details></section>
+    </div>
+  </dialog>
+
+  <dialog id="integrations-dialog" class="modal integrations-modal" aria-labelledby="integrations-title">
+    <div class="modal-header"><div><p class="eyebrow">CONECTAR COM CLAREZA</p><h2 id="integrations-title">Integrações</h2></div><button class="icon-button" type="button" data-close="integrations-dialog" aria-label="Fechar integrações"><span data-icon="x"></span></button></div>
+    <form id="integrations-form" autocomplete="off">
+      <div class="modal-body">
+        <section class="integration-section" aria-labelledby="integration-ai-title"><div class="integration-section-title"><span data-icon="sparkles"></span><h3 id="integration-ai-title">Validadora · OpenAI</h3></div><p class="form-intro">O modelo seleciona candidatos e explica os motivos. Preço, cupom e link são preservados pelo aplicativo. Você precisa de uma chave da API da OpenAI; a assinatura do ChatGPT não fornece esse acesso.</p>
+          <p class="integration-connection" id="ai-key-status" role="status">Consultando configuração…</p>
+          <label class="field">Chave da API OpenAI<input id="integration-ai-key" type="password" autocomplete="new-password" spellcheck="false" placeholder="Cole somente aqui; vazio mantém a chave atual"><small>Obtenha sua chave em <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">platform.openai.com/api-keys</a>. Não a envie no chat.</small></label>
+          <label class="checkbox-field"><input id="remember-ai-key" type="checkbox"><span>Lembrar esta chave neste computador</span></label>
+          <button class="button button-quiet secret-clear" id="clear-ai-key" type="button">Esquecer chave local</button>
+          <div class="form-grid"><label class="field">Modelo<input id="integration-model" value="gpt-4.1-mini" required maxlength="100"><small>Modelo inicial configurável. A disponibilidade depende da conta da API.</small></label><label class="field">Limite diário de chamadas<input id="integration-daily-limit" type="number" min="1" max="100" value="20" required><small>Limita chamadas; não é um teto financeiro. Confira o uso na OpenAI.</small></label></div>
+        </section>
+        <section class="integration-section" aria-labelledby="integration-meta-title"><div class="integration-section-title"><span data-icon="whatsapp"></span><h3 id="integration-meta-title">WhatsApp · Diagnóstico da Meta</h3></div><p class="form-intro">Este teste verifica o acesso ao número pela API oficial. Ele não envia mensagens e não confirma suporte a grupos ou comunidades. Não precisamos da sua senha de WhatsApp.</p>
+          <ol class="meta-instructions"><li>Acesse <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer">Meus aplicativos na Meta</a> e conclua o login na sua conta.</li><li>No aplicativo com o produto WhatsApp, abra a configuração da API para obter o token de acesso e o ID do número de telefone.</li><li>Informe os dados abaixo e teste a conexão. O ID do número é um identificador da Meta, não o número com DDD.</li></ol>
+          <p class="integration-connection" id="meta-token-status" role="status">Consultando configuração…</p>
+          <label class="field">Token de acesso da Meta<input id="integration-meta-token" type="password" autocomplete="new-password" spellcheck="false" placeholder="Vazio mantém o token atual"></label>
+          <label class="checkbox-field"><input id="remember-meta-token" type="checkbox"><span>Lembrar este token neste computador</span></label>
+          <button class="button button-quiet secret-clear" id="clear-meta-token" type="button">Esquecer token local</button>
+          <div class="form-grid"><label class="field">ID do número de telefone<input id="integration-phone-id" inputmode="numeric" maxlength="40" placeholder="Ex.: identificador exibido pela Meta"></label><label class="field">Versão da Graph API<input id="integration-api-version" maxlength="15" value="v23.0" placeholder="v23.0"><small>Use uma versão suportada na sua configuração da Meta.</small></label></div>
+          <button type="button" class="button button-secondary" id="test-meta-connection"><span data-icon="shield"></span> Salvar e testar conexão Meta</button><div id="meta-test-result" class="meta-test-result" role="status" hidden></div>
+        </section>
+        <div class="form-note credentials-note"><span data-icon="shield"></span><p>Sem marcar “Lembrar”, os novos segredos ficam apenas nesta sessão. Se você marcar, serão guardados em arquivo local com permissão restrita, sem criptografia. Eles não entram no backup JSON, mas são levados ao copiar a pasta inteira com <code>data</code>. Mantenha essa pasta privada.</p></div>
+        <p class="inline-error" id="integrations-error" role="alert" hidden></p>
+      </div>
+      <div class="modal-footer"><button class="button button-secondary" type="button" data-close="integrations-dialog">Fechar</button><button class="button button-primary" id="save-integrations" type="submit">Salvar integrações</button></div>
+    </form>
+  </dialog>
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+</body>
+</html>

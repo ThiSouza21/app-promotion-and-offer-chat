@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Achadinhos
+Comment=Organizar ofertas e preparar mensagens para o WhatsApp
+Exec=python3 -c "import os,subprocess,sys,urllib.parse; p=sys.argv[1]; p=urllib.parse.unquote(urllib.parse.urlsplit(p).path) if p.startswith('file:') else p; sys.exit(subprocess.call(['bash', os.path.join(os.path.dirname(os.path.realpath(p)), 'Iniciar no Linux.sh')]))" %k
+Icon=applications-internet
+Terminal=true
+Categories=Network;
+StartupNotify=false
