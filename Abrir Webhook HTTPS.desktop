@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Oásis das Promos - Webhook HTTPS
+Comment=Expor somente o receptor de webhooks da Meta
+Exec=python3 -c "import os,subprocess,sys,urllib.parse; p=sys.argv[1]; p=urllib.parse.unquote(urllib.parse.urlsplit(p).path) if p.startswith('file:') else p; sys.exit(subprocess.call(['bash', os.path.join(os.path.dirname(os.path.realpath(p)), 'Iniciar Webhook HTTPS.sh')]))" %k
+Icon=network-server
+Terminal=true
+Categories=Network;
+StartupNotify=false

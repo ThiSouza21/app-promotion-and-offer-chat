@@ -12,3 +12,4 @@ Thumbs.db
 credentials.json
 *.sqlite3
 *.sqlite3-*
+tools/

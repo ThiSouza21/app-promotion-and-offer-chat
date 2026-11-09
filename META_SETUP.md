@@ -1,6 +1,6 @@
 # Configurar o diagnóstico da Meta
 
-Esta etapa verifica se um token consegue ler os dados de um número na API oficial do WhatsApp. **Ela não envia mensagens, não configura webhooks ou modelos de mensagem e não confirma acesso a grupos ou comunidades.** O envio atual continua manual pelo WhatsApp.
+Esta etapa verifica se um token consegue ler os dados de um número na API oficial do WhatsApp. **Esse teste de conexão não envia mensagens nem confirma acesso a grupos ou comunidades.** Para configurar o novo receptor de webhook, consulte [WEBHOOKS.md](WEBHOOKS.md). O envio atual continua manual pelo WhatsApp.
 
 ## Na sua conta da Meta
 

@@ -713,3 +713,46 @@ $("#integrations-dialog").addEventListener("close", () => {
   $("#integration-meta-token").value = "";
   if ($("#lab-dialog").open) loadAutomationState();
 });
+
+// Apenas a porta isolada do receptor será exposta pelo túnel HTTPS.
+async function refreshWebhook() {
+  inlineError('#webhook-error');
+  try {
+    const state = await api('/api/webhook/state');
+    $('#webhook-url').value = state.public_url || '';
+    $('#webhook-status').textContent = `${state.listening ? 'Receptor local ativo' : 'Receptor parado'} · ${state.app_secret_configured ? 'Chave do app configurada' : 'Falta a chave secreta do app'} · ${state.total} evento(s) salvo(s).${state.last_verified_at ? ' Verificação de callback recebida nesta sessão.' : ''} A URL do túnel exibida não comprova conexão externa; confirme em Verificar e salvar na Meta.`;
+    const list = $('#webhook-events'); list.replaceChildren();
+    const labels = {sent:'Enviada',delivered:'Entregue',read:'Lida',failed:'Falha',deleted:'Apagada'};
+    if (!state.events.length) list.append(textElement('p','','Nenhum evento recebido ainda.'));
+    for (const item of state.events) {
+      const card = textElement('article','lab-result-card');
+      card.append(textElement('strong','',item.kind === 'incoming' ? 'Mensagem recebida' : (labels[item.status] || item.status)), textElement('p','', `${dateTime.format(new Date(item.received_at))} · ${item.sender || item.recipient || 'Número não informado'}`));
+      if (item.body) card.append(textElement('p','',item.body));
+      if (item.error_code) card.append(textElement('p','inline-error',`Erro ${item.error_code}: ${item.error_message}`));
+      if (item.error_code === '130497') card.append(textElement('p','','A Meta restringiu o envio para o país do destinatário. O webhook registra a falha; ele não remove essa restrição.'));
+      list.append(card);
+    }
+  } catch(error) {inlineError('#webhook-error',error.message);}
+}
+$('#webhook-button').addEventListener('click', async()=>{
+  $('#webhook-dialog').showModal();
+  await refreshWebhook();
+  try {const value=await api('/api/webhook/verify-token',{method:'POST',body:{}}); if ($('#webhook-dialog').open) $('#webhook-verify-token').value=value.verify_token;}
+  catch(error){inlineError('#webhook-error',error.message);}
+});
+$('#webhook-refresh').addEventListener('click',refreshWebhook);
+$('#webhook-save').addEventListener('click',async()=>{
+  const button=$('#webhook-save');setBusy(button,true);
+  try {
+    await api('/api/webhook/config',{method:'POST',body:{app_secret:$('#webhook-app-secret').value.trim()}});
+    $('#webhook-app-secret').value='';await refreshWebhook();toast('Chave do webhook salva neste computador.');
+  }catch(error){inlineError('#webhook-error',error.message);}finally{setBusy(button,false);}
+});
+$('#webhook-copy-token').addEventListener('click',async()=>{
+  try {await navigator.clipboard.writeText($('#webhook-verify-token').value);toast('Token de verificação copiado. Cole no campo Verificar token da Meta.');}
+  catch {$('#webhook-verify-token').type='text';$('#webhook-verify-token').select();inlineError('#webhook-error','Selecione o token de verificação e copie com Ctrl+C.');}
+});
+$('#webhook-dialog').addEventListener('close',()=>{
+  $('#webhook-app-secret').value='';$('#webhook-verify-token').value='';$('#webhook-verify-token').type='password';
+});
+setInterval(()=>{if($('#webhook-dialog').open && !document.hidden) refreshWebhook();},10000);

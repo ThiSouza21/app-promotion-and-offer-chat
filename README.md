@@ -35,6 +35,10 @@ A cópia leva suas ofertas e configurações. **Se você tiver marcado “Lembra
 
 Preço, frete, cupom e validade precisam ser conferidos por você. Uma mensagem preparada não garante que a promoção continue disponível. Ainda não há busca automática em lojas, integração com catálogos de afiliados ou envio pela API do WhatsApp.
 
+## Receber webhooks do WhatsApp
+
+O botão **Webhooks** permite configurar a chave secreta do app, copiar o token de verificação e acompanhar mensagens recebidas/status. Abra **Abrir Webhook HTTPS.desktop** para expor somente o receptor por HTTPS. Veja o passo a passo e as limitações em [WEBHOOKS.md](WEBHOOKS.md). Não há resposta automática nem envio de campanhas.
+
 ## Testar a IA e configurar integrações
 
 - **Testar validadora IA** abre um laboratório para filtrar e revisar até 20 candidatos. Comece por **Carregar exemplos fictícios** e **Testar filtros (sem IA)**: não exige chave, não chama a OpenAI e não consome créditos de IA. Os exemplos não podem virar ofertas. Para testar suas próprias ofertas sem escrever JSON, cadastre-as pelo formulário normal, confira os dados nas lojas e clique em **Usar ofertas do painel** no laboratório. Confirme a conferência apenas depois de fazê-la; o aplicativo não consulta as lojas.

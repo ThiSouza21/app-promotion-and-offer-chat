@@ -17,6 +17,7 @@
       <nav aria-label="Navegação principal">
         <button class="nav-item active" id="nav-queue"><span data-icon="grid"></span> Minha fila <span class="nav-badge" id="sidebar-count">0</span></button>
         <button class="nav-item" id="lab-button" aria-label="Testar validadora IA" title="Testar validadora IA"><span data-icon="sparkles"></span> Validadora IA</button>
+        <button class="nav-item" id="webhook-button" title="Webhooks"><span data-icon="send"></span> Webhooks</button>
         <button class="nav-item" id="integrations-button" aria-label="Integrações" title="Integrações"><span data-icon="shield"></span> Integrações</button>
         <button class="nav-item" id="settings-button"><span data-icon="settings"></span> Configurações</button>
       </nav>
@@ -142,6 +143,23 @@
       </div>
       <div class="modal-footer"><button class="button button-secondary" type="button" data-close="integrations-dialog">Fechar</button><button class="button button-primary" id="save-integrations" type="submit">Salvar integrações</button></div>
     </form>
+  </dialog>
+  <dialog id="webhook-dialog" class="modal integrations-modal" aria-labelledby="webhook-title">
+    <div class="modal-header"><div><p class="eyebrow">OÁSIS DAS PROMOS</p><h2 id="webhook-title">Webhooks do WhatsApp</h2></div><button class="icon-button" type="button" data-close="webhook-dialog" aria-label="Fechar webhooks">×</button></div>
+    <div class="modal-body">
+      <p>Receba mensagens e acompanhe entrega, leitura e falhas. Receber um “oi” não gera resposta automática.</p>
+      <ol class="meta-instructions"><li>Salve abaixo a <strong>chave secreta do app</strong> encontrada na Meta em Configurações do app → Básico. Ela é diferente do token de acesso e fica só no servidor.</li><li>Abra <strong>Abrir Webhook HTTPS.desktop</strong> na pasta do programa. Na primeira vez ele baixa e verifica o conector oficial Cloudflare.</li><li>Atualize esta tela, copie a URL pública para <strong>URL de callback</strong> na Meta e copie o token de verificação para <strong>Verificar token</strong>.</li><li>Na Meta, clique em <strong>Verificar e salvar</strong> e assine o campo <strong>messages</strong>. A entrega de eventos de produção depende também do modo/publicação e permissões exigidos na sua conta.</li></ol>
+      <label class="field">Chave secreta do app Meta<input type="password" id="webhook-app-secret" autocomplete="new-password" placeholder="Vazio mantém a chave atual"><small>Salva em arquivo local protegido, sem criptografia. Não envie pelo chat.</small></label>
+      <button class="button button-primary" type="button" id="webhook-save">Salvar chave do webhook</button>
+      <p id="webhook-status" role="status"></p>
+      <label class="field">URL pública de callback<input id="webhook-url" readonly placeholder="Abra o iniciador HTTPS para gerar a URL"><small>O túnel de teste muda de endereço ao reiniciar. Atualize o callback na Meta. Mantenha o aplicativo e o túnel abertos.</small></label>
+      <label class="field">Token de verificação<input id="webhook-verify-token" type="password" readonly><small>Gerado pelo aplicativo; não é o token de acesso da Meta.</small></label>
+      <button class="button button-secondary" type="button" id="webhook-copy-token">Copiar token de verificação</button>
+      <button class="button button-secondary" type="button" id="webhook-refresh">Atualizar eventos e URL</button>
+      <p id="webhook-error" class="inline-error" role="alert" hidden></p>
+      <h3>Últimos eventos</h3><p>Recebida não significa respondida; enviada não significa entregue. Eventos repetidos são ignorados.</p>
+      <div id="webhook-events" class="lab-selected"></div>
+    </div>
   </dialog>
   <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
 </body>

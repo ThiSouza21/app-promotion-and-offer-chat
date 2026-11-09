@@ -22,6 +22,7 @@ import uuid
 import webbrowser
 
 from automation import AutomationError, AutomationService
+from meta_webhook import WebhookService
 
 
 ROOT = Path(__file__).resolve().parent
@@ -308,6 +309,7 @@ class LocalServer(ThreadingHTTPServer):
     def __init__(self, address, store):
         self.store = store
         self.automation = AutomationService(store, validate_offer, make_message)
+        self.webhook = WebhookService(store)
         self.allowed_hosts = {f"127.0.0.1:{address[1]}", f"localhost:{address[1]}"}
         super().__init__(address, Handler)
 
@@ -378,6 +380,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({"offers": self.server.store.list(), "settings": self.server.store.settings(), "server_time": utc_now(), "delivery_mode": DELIVERY_MODE})
             elif path == "/api/automation/state":
                 self.send_json(self.server.automation.state())
+            elif path == "/api/webhook/state":
+                self.send_json(self.server.webhook.state())
             elif path == "/api/backup":
                 self.send_json(self.server.store.backup(), attachment=f"achadinhos-backup-{datetime.now().strftime('%Y-%m-%d')}.json")
             elif path in {"/", "/index.html", "/app.js", "/styles.css"}:
@@ -416,6 +420,10 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(self.server.automation.approve(data))
             elif self.command == "POST" and path == "/api/automation/meta/test":
                 self.send_json(self.server.automation.test_meta(data))
+            elif self.command == "POST" and path == "/api/webhook/config":
+                self.send_json(self.server.webhook.configure(data))
+            elif self.command == "POST" and path == "/api/webhook/verify-token":
+                self.send_json({"verify_token": self.server.webhook.verify_token()})
             else:
                 self.send_json({"error": "Operação não encontrada."}, 404)
         except (ValidationError, AutomationError) as exc:
@@ -446,10 +454,15 @@ def main():
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--data-dir", type=Path, default=ROOT / "data")
     parser.add_argument("--no-browser", action="store_true")
+    parser.add_argument("--webhook-port", type=int, help="Porta local isolada para webhook (padrão: 8766).")
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
         parser.error("A porta deve estar entre 1 e 65535.")
+    webhook_port = args.webhook_port if args.webhook_port is not None else (8766 if args.port == 8765 else 0)
+    if not 0 <= webhook_port <= 65535 or webhook_port == args.port:
+        parser.error("Escolha uma porta de webhook diferente da porta do painel.")
     url = f"http://127.0.0.1:{args.port}"
+    server = None
     try:
         running = existing_instance(url)
         expected_key = hashlib.sha256(str(args.data_dir.resolve()).encode("utf-8")).hexdigest()
@@ -464,7 +477,10 @@ def main():
             return 0
         store = Store(args.data_dir)
         server = LocalServer((args.host, args.port), store)
+        server.webhook.start(webhook_port)
     except (OSError, sqlite3.Error, AutomationError) as exc:
+        if server:
+            server.server_close()
         print(f"Não foi possível iniciar o Achadinhos: {exc}", file=sys.stderr)
         print("Verifique se a pasta permite gravação ou se a porta já está sendo usada.", file=sys.stderr)
         return 1
@@ -486,6 +502,7 @@ def main():
     worker.start()
     print(f"\nAchadinhos aberto em {url}", flush=True)
     print(f"Dados salvos em: {store.data_dir}", flush=True)
+    print(f"Webhook isolado na porta {server.webhook.server.server_port}; configure em Webhooks no painel.", flush=True)
     print("Mantenha esta janela aberta. Pode minimizá-la.", flush=True)
     print("As mensagens são preparadas aqui; o envio no WhatsApp é manual.", flush=True)
     print("Para encerrar, feche esta janela ou pressione Ctrl+C.\n", flush=True)
@@ -498,6 +515,7 @@ def main():
     finally:
         stop.set()
         server.server_close()
+        server.webhook.close()
         worker.join(timeout=2)
     return 0
 
